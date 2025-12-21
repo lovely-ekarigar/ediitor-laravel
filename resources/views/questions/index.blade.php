@@ -164,3 +164,81 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.querySelector('form[action="{{ route("questions.index") }}"]');
+    const searchInput = document.querySelector('input[name="search"]');
+    const categoryFilter = document.querySelector('select[name="category_id"]');
+    const difficultyFilter = document.querySelector('select[name="difficulty"]');
+    
+    if (!searchForm) return;
+    
+    let searchTimeout;
+    let isSubmitting = false;
+    
+    // Function to submit form
+    function submitSearch() {
+        if (isSubmitting) return;
+        isSubmitting = true;
+        searchForm.submit();
+    }
+    
+    // Real-time search with debouncing (800ms delay after user stops typing)
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchValue = this.value.trim();
+            
+            // Clear search immediately if empty
+            if (searchValue === '') {
+                clearTimeout(searchTimeout);
+                submitSearch();
+                return;
+            }
+            
+            // Debounce search submission
+            searchTimeout = setTimeout(function() {
+                submitSearch();
+            }, 800); // Wait 800ms after user stops typing
+        });
+        
+        // Allow Enter key to submit immediately
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(searchTimeout);
+                submitSearch();
+            }
+        });
+    }
+    
+    // Auto-submit when category filter changes
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', function() {
+            clearTimeout(searchTimeout);
+            submitSearch();
+        });
+    }
+    
+    // Auto-submit when difficulty filter changes
+    if (difficultyFilter) {
+        difficultyFilter.addEventListener('change', function() {
+            clearTimeout(searchTimeout);
+            submitSearch();
+        });
+    }
+    
+    // Clear button functionality - reset all filters and search
+    const clearButton = document.querySelector('a[href="{{ route("questions.index") }}"]');
+    if (clearButton) {
+        clearButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            clearTimeout(searchTimeout);
+            window.location.href = '{{ route("questions.index") }}';
+        });
+    }
+});
+</script>
+@endpush

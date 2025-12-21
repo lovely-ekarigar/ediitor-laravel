@@ -17,10 +17,10 @@ class QuestionController extends Controller
     {
         $query = Question::with(['category', 'options']);
 
-        // Search functionality
+        // Search functionality - case-insensitive search in question text
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('question_text', 'like', "%{$search}%");
+            $query->whereRaw('LOWER(question_text) LIKE ?', ['%' . strtolower($search) . '%']);
         }
 
         // Filter by category
