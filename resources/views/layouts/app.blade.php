@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- TinyMCE -->
-    <script src="https://cdn.tiny.cloud/1/vcgtd84ze4qulu2san21h4f0z588potlf0fypip8ndrt21mc/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/r1mf3ggcwh9wd8a788yi8moqdpje8fd3oo9cgc8qmwo708qu/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     
     @stack('styles')
 </head>

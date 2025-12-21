@@ -9,7 +9,7 @@
 </div>
 
 <div class="bg-white rounded-xl shadow-md p-8">
-    <form action="{{ route('questions.store') }}" method="POST" id="questionForm">
+    <form action="{{ route('questions.store') }}" method="POST" id="questionForm" novalidate>
         @csrf
 
         <!-- Category -->
@@ -45,7 +45,6 @@
                 id="question_text" 
                 rows="6"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('question_text') border-red-500 @enderror"
-                required
             >{{ old('question_text') }}</textarea>
             @error('question_text')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -211,12 +210,37 @@
         height: 400,
         menubar: true,
         plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            // Core editing features
+            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+            // Premium features
+            'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'ai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
         ],
-        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter | image table link | numlist bullist',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+        
+        // TinyComments configuration
+        tinycomments_mode: 'embedded',
+        tinycomments_author: 'Author name',
+        
+        // Merge tags configuration
+        mergetags_list: [
+            { value: 'First.Name', title: 'First Name' },
+            { value: 'Email', title: 'Email' },
+        ],
+        
+        // AI configuration
+        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+        
+        // Uploadcare configuration
+        uploadcare_public_key: 'edccb41ff715718a3a7f',
+        
+        // Setup callback to ensure editor is ready
+        setup: function(editor) {
+            editor.on('init', function() {
+                // Editor is ready
+                console.log('TinyMCE initialized successfully');
+            });
+        },
         
         // Image Upload Configuration
         images_upload_url: '{{ route("upload.image") }}',
@@ -322,31 +346,65 @@
     }
 
     // Form submission validation and TinyMCE content sync
-    document.getElementById('questionForm').addEventListener('submit', function(e) {
-        // Sync TinyMCE content to textarea before submission
-        const editor = tinymce.get('question_text');
-        if (editor) {
-            const content = editor.getContent();
-            // Set the textarea value with TinyMCE content
-            document.getElementById('question_text').value = content;
+    const form = document.getElementById('questionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const textarea = document.getElementById('question_text');
+            let editor = null;
+            let hasContent = false;
             
-            // Validate that content is not empty (strip HTML tags and whitespace)
-            const textContent = editor.getContent({ format: 'text' }).trim();
-            if (!textContent) {
+            // Try to get TinyMCE editor instance
+            if (typeof tinymce !== 'undefined') {
+                try {
+                    editor = tinymce.get('question_text');
+                    if (editor) {
+                        // Get content from TinyMCE editor and sync to textarea
+                        const content = editor.getContent();
+                        if (textarea) {
+                            textarea.value = content;
+                        }
+                        
+                        // Check if content is not empty (strip HTML tags and whitespace)
+                        const textContent = editor.getContent({ format: 'text' }).trim();
+                        if (textContent) {
+                            hasContent = true;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error getting TinyMCE content:', error);
+                }
+            }
+            
+            // Fallback: check textarea directly if TinyMCE didn't work
+            if (!hasContent && textarea) {
+                const textareaValue = textarea.value.trim();
+                if (textareaValue) {
+                    hasContent = true;
+                }
+            }
+            
+            // Validate question text
+            if (!hasContent) {
                 e.preventDefault();
                 alert('Please enter question text!');
-                editor.focus();
+                if (editor) {
+                    editor.focus();
+                } else if (textarea) {
+                    textarea.focus();
+                }
                 return false;
             }
-        }
-        
-        // Validate correct option selection
-        const correctOption = document.querySelector('input[name="correct_option"]:checked');
-        if (!correctOption) {
-            e.preventDefault();
-            alert('Please select the correct answer!');
-            return false;
-        }
-    });
+            
+            // Validate correct option selection
+            const correctOption = document.querySelector('input[name="correct_option"]:checked');
+            if (!correctOption) {
+                e.preventDefault();
+                alert('Please select the correct answer!');
+                return false;
+            }
+            
+            // If all validations pass, form will submit naturally with synced content
+        });
+    }
 </script>
 @endpush
