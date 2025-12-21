@@ -321,8 +321,26 @@
         });
     }
 
-    // Form submission validation
+    // Form submission validation and TinyMCE content sync
     document.getElementById('questionForm').addEventListener('submit', function(e) {
+        // Sync TinyMCE content to textarea before submission
+        const editor = tinymce.get('question_text');
+        if (editor) {
+            const content = editor.getContent();
+            // Set the textarea value with TinyMCE content
+            document.getElementById('question_text').value = content;
+            
+            // Validate that content is not empty (strip HTML tags and whitespace)
+            const textContent = editor.getContent({ format: 'text' }).trim();
+            if (!textContent) {
+                e.preventDefault();
+                alert('Please enter question text!');
+                editor.focus();
+                return false;
+            }
+        }
+        
+        // Validate correct option selection
         const correctOption = document.querySelector('input[name="correct_option"]:checked');
         if (!correctOption) {
             e.preventDefault();
