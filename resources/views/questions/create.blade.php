@@ -40,12 +40,8 @@
             <label for="question_text" class="block text-sm font-semibold text-gray-700 mb-2">
                 Question Text <span class="text-red-500">*</span>
             </label>
-            <textarea 
-                name="question_text" 
-                id="question_text" 
-                rows="6"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('question_text') border-red-500 @enderror"
-            >{{ old('question_text') }}</textarea>
+            <div id="editorjs" class="border border-gray-300 rounded-lg bg-white min-h-[400px] p-4 @error('question_text') border-red-500 @enderror" style="cursor: text;"></div>
+            <input type="hidden" name="question_text" id="question_text" value="{{ old('question_text') }}">
             @error('question_text')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -202,81 +198,459 @@
 </div>
 @endsection
 
+@push('styles')
+<style>
+    #editorjs {
+        min-height: 400px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+    }
+    
+    #editorjs .ce-block__content {
+        max-width: 100%;
+    }
+    
+    #editorjs .ce-toolbar__content {
+        max-width: 100%;
+    }
+    
+    #editorjs .codex-editor__redactor {
+        padding-bottom: 50px;
+    }
+    
+    /* Make editor clickable and interactive */
+    #editorjs .ce-block {
+        cursor: text;
+    }
+    
+    #editorjs .ce-paragraph {
+        cursor: text;
+        min-height: 1.5em;
+    }
+    
+    /* Style for placeholder */
+    #editorjs .ce-paragraph[data-placeholder]:empty::before {
+        content: attr(data-placeholder);
+        color: #999;
+        font-style: italic;
+    }
+    
+    /* Plus icon visibility and styling */
+    #editorjs .ce-toolbar__plus {
+        color: #6b7280 !important;
+        background: transparent !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 4px !important;
+        width: 24px !important;
+        height: 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+    
+    #editorjs .ce-toolbar__plus:hover {
+        background: #f3f4f6 !important;
+        border-color: #9ca3af !important;
+        color: #374151 !important;
+    }
+    
+    #editorjs .ce-toolbar__plus svg {
+        width: 16px !important;
+        height: 16px !important;
+        stroke: currentColor !important;
+    }
+    
+    /* Ensure toolbar is visible */
+    #editorjs .ce-toolbar {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    /* Image tool styling */
+    #editorjs .image-tool {
+        margin: 20px 0;
+    }
+    
+    #editorjs .image-tool__image {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Make sure editor is visible */
+    #editorjs .codex-editor {
+        min-height: 400px;
+    }
+</style>
+@endpush
+
 @push('scripts')
+<!-- Load Editor.js Core FIRST - Using unpkg CDN -->
+<script src="https://unpkg.com/@editorjs/editorjs@latest" onload="console.log('Editor.js core script loaded'); window.editorJSCoreLoaded = true; console.log('EditorJS available:', typeof EditorJS, typeof window.EditorJS);" onerror="console.error('Failed to load Editor.js core script');"></script>
+
+<!-- Load Editor.js Tools - Using unpkg CDN -->
+<script src="https://unpkg.com/@editorjs/header@latest"></script>
+<script src="https://unpkg.com/@editorjs/list@latest"></script>
+<script src="https://unpkg.com/@editorjs/checklist@latest"></script>
+<script src="https://unpkg.com/@editorjs/table@latest"></script>
+<script src="https://unpkg.com/@editorjs/quote@latest"></script>
+<script src="https://unpkg.com/@editorjs/marker@latest"></script>
+<script src="https://unpkg.com/@editorjs/code@latest"></script>
+<script src="https://unpkg.com/@editorjs/image@latest"></script>
+<script src="https://unpkg.com/@editorjs/link@latest"></script>
+<script src="https://unpkg.com/@editorjs/inline-code@latest"></script>
+<script src="https://unpkg.com/@editorjs/delimiter@latest"></script>
+<script src="https://unpkg.com/@editorjs/warning@latest"></script>
+<script src="https://unpkg.com/@editorjs/paragraph@latest"></script>
+
 <script>
-    // TinyMCE Initialization
-    tinymce.init({
-        selector: '#question_text',
-        height: 400,
-        menubar: true,
-        plugins: [
-            // Core editing features
-            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-            // Premium features
-            'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'ai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
-        ],
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+    // Editor.js Initialization
+    let editor;
+    let toolsLoaded = 0;
+    const totalTools = 13;
+    
+    // Function to check if all required tools are loaded
+    function checkToolsLoaded() {
+        // Check for EditorJS - try multiple ways it might be exposed
+        let EditorJSClass = undefined;
+        if (typeof EditorJS !== 'undefined') {
+            EditorJSClass = EditorJS;
+        } else if (typeof window.EditorJS !== 'undefined') {
+            EditorJSClass = window.EditorJS;
+        } else if (typeof window.Editorjs !== 'undefined') {
+            EditorJSClass = window.Editorjs;
+        } else if (window.EditorJS && typeof window.EditorJS === 'function') {
+            EditorJSClass = window.EditorJS;
+        }
         
-        // TinyComments configuration
-        tinycomments_mode: 'embedded',
-        tinycomments_author: 'Author name',
+        const requiredTools = {
+            'EditorJS': EditorJSClass !== undefined,
+            'Header': typeof Header !== 'undefined' || typeof window.Header !== 'undefined',
+            'List': typeof List !== 'undefined' || typeof window.List !== 'undefined',
+            'Paragraph': typeof Paragraph !== 'undefined' || typeof window.Paragraph !== 'undefined',
+            'Checklist': typeof Checklist !== 'undefined' || typeof window.Checklist !== 'undefined',
+            'Table': typeof Table !== 'undefined' || typeof window.Table !== 'undefined',
+            'Quote': typeof Quote !== 'undefined' || typeof window.Quote !== 'undefined',
+            'Marker': typeof Marker !== 'undefined' || typeof window.Marker !== 'undefined',
+            'Code': typeof Code !== 'undefined' || typeof window.Code !== 'undefined',
+            'ImageTool': typeof ImageTool !== 'undefined' || typeof window.ImageTool !== 'undefined',
+            'LinkTool': typeof LinkTool !== 'undefined' || typeof window.LinkTool !== 'undefined',
+            'InlineCode': typeof InlineCode !== 'undefined' || typeof window.InlineCode !== 'undefined',
+            'Delimiter': typeof Delimiter !== 'undefined' || typeof window.Delimiter !== 'undefined',
+            'Warning': typeof Warning !== 'undefined' || typeof window.Warning !== 'undefined'
+        };
         
-        // Merge tags configuration
-        mergetags_list: [
-            { value: 'First.Name', title: 'First Name' },
-            { value: 'Email', title: 'Email' },
-        ],
+        // Debug: Log all possible EditorJS locations
+        console.log('Tool availability check:', requiredTools);
+        console.log('EditorJS checks:', {
+            'EditorJS': typeof EditorJS,
+            'window.EditorJS': typeof window.EditorJS,
+            'window.Editorjs': typeof window.Editorjs,
+            'window.EditorJS (value)': window.EditorJS,
+            'Found class': EditorJSClass !== undefined
+        });
         
-        // AI configuration
-        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+        // Check if core script loaded flag is set
+        if (!window.editorJSCoreLoaded) {
+            return false;
+        }
         
-        // Uploadcare configuration
-        uploadcare_public_key: 'edccb41ff715718a3a7f',
+        // Check if core tools are available (EditorJS is critical)
+        if (EditorJSClass && requiredTools.Header && requiredTools.Paragraph) {
+            // List is optional but preferred
+            return true;
+        }
+        return false;
+    }
+    
+    // Function to wait for scripts to load
+    function waitForEditorJS(callback, maxAttempts = 100) {
+        let attempts = 0;
         
-        // Setup callback to ensure editor is ready
-        setup: function(editor) {
-            editor.on('init', function() {
-                // Editor is ready
-                console.log('TinyMCE initialized successfully');
+        function check() {
+            attempts++;
+            
+            if (checkToolsLoaded()) {
+                console.log('All required Editor.js tools loaded successfully!');
+                callback();
+            } else if (attempts < maxAttempts) {
+                if (attempts % 10 === 0) {
+                    console.log('Waiting for Editor.js tools... Attempt ' + attempts);
+                }
+                setTimeout(check, 100);
+            } else {
+                console.error('Editor.js failed to load after ' + maxAttempts + ' attempts');
+                const editorElement = document.getElementById('editorjs');
+                if (editorElement) {
+                    editorElement.innerHTML = '<div class="p-4 text-red-500 border border-red-300 rounded"><p class="font-semibold">Editor.js failed to load</p><p class="text-sm mt-2">Please check browser console (F12) for details and refresh the page.</p></div>';
+                }
+            }
+        }
+        
+        // Start checking after a short delay to allow scripts to load
+        setTimeout(check, 200);
+    }
+    
+    // Initialize Editor.js after all scripts are loaded
+    waitForEditorJS(function() {
+        try {
+            console.log('Initializing Editor.js...');
+            
+            // Get EditorJS class - try multiple ways it might be exposed
+            let EditorJSClass = undefined;
+            if (typeof EditorJS !== 'undefined') {
+                EditorJSClass = EditorJS;
+            } else if (typeof window.EditorJS !== 'undefined') {
+                EditorJSClass = window.EditorJS;
+            } else if (typeof window.Editorjs !== 'undefined') {
+                EditorJSClass = window.Editorjs;
+            } else if (window.EditorJS && typeof window.EditorJS === 'function') {
+                EditorJSClass = window.EditorJS;
+            }
+            
+            if (!EditorJSClass) {
+                console.error('EditorJS not found. Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('editor')));
+                throw new Error('EditorJS class not found. Please check if Editor.js core script loaded correctly.');
+            }
+            
+            console.log('Using EditorJS class:', EditorJSClass);
+            
+            // Build tools object, filtering out undefined tools
+            const toolsConfig = {
+                    // Paragraph tool (default, supports inline formatting)
+                    paragraph: (typeof Paragraph !== 'undefined' || typeof window.Paragraph !== 'undefined') ? {
+                        class: typeof Paragraph !== 'undefined' ? Paragraph : window.Paragraph,
+                        inlineToolbar: true,
+                        config: {
+                            placeholder: 'Type your text here...'
+                        }
+                    } : undefined,
+                    // Header tool
+                    header: (typeof Header !== 'undefined' || typeof window.Header !== 'undefined') ? {
+                        class: typeof Header !== 'undefined' ? Header : window.Header,
+                        config: {
+                            levels: [1, 2, 3, 4, 5, 6],
+                            defaultLevel: 3,
+                            placeholder: 'Enter a header'
+                        },
+                        inlineToolbar: true,
+                        shortcut: 'CMD+SHIFT+H'
+                    } : undefined,
+                    // List tool
+                    list: (typeof List !== 'undefined' || typeof window.List !== 'undefined') ? {
+                        class: typeof List !== 'undefined' ? List : window.List,
+                        inlineToolbar: true,
+                        config: {
+                            defaultStyle: 'unordered'
+                        },
+                        shortcut: 'CMD+SHIFT+L'
+                    } : undefined,
+                    // Checklist tool
+                    checklist: (typeof Checklist !== 'undefined' || typeof window.Checklist !== 'undefined') ? {
+                        class: typeof Checklist !== 'undefined' ? Checklist : window.Checklist,
+                        inlineToolbar: true,
+                        shortcut: 'CMD+SHIFT+C'
+                    } : undefined,
+                    // Table tool
+                    table: (typeof Table !== 'undefined' || typeof window.Table !== 'undefined') ? {
+                        class: typeof Table !== 'undefined' ? Table : window.Table,
+                        inlineToolbar: true,
+                        config: {
+                            rows: 2,
+                            cols: 2,
+                            withHeadings: true
+                        },
+                        shortcut: 'CMD+ALT+T'
+                    } : undefined,
+                    // Quote tool
+                    quote: (typeof Quote !== 'undefined' || typeof window.Quote !== 'undefined') ? {
+                        class: typeof Quote !== 'undefined' ? Quote : window.Quote,
+                        inlineToolbar: true,
+                        shortcut: 'CMD+SHIFT+O',
+                        config: {
+                            quotePlaceholder: 'Enter a quote',
+                            captionPlaceholder: 'Quote\'s author',
+                        }
+                    } : undefined,
+                    // Marker tool (highlighting)
+                    marker: (typeof Marker !== 'undefined' || typeof window.Marker !== 'undefined') ? {
+                        class: typeof Marker !== 'undefined' ? Marker : window.Marker,
+                        shortcut: 'CMD+SHIFT+M',
+                    } : undefined,
+                    // Code tool
+                    code: (typeof Code !== 'undefined' || typeof window.Code !== 'undefined') ? {
+                        class: typeof Code !== 'undefined' ? Code : window.Code,
+                        config: {
+                            placeholder: 'Enter code',
+                        },
+                        shortcut: 'CMD+SHIFT+C'
+                    } : undefined,
+                    // Inline Code tool
+                    inlineCode: (typeof InlineCode !== 'undefined' || typeof window.InlineCode !== 'undefined') ? {
+                        class: typeof InlineCode !== 'undefined' ? InlineCode : window.InlineCode,
+                        shortcut: 'CMD+SHIFT+M',
+                    } : undefined,
+                    // Link tool
+                    linkTool: (typeof LinkTool !== 'undefined' || typeof window.LinkTool !== 'undefined') ? {
+                        class: typeof LinkTool !== 'undefined' ? LinkTool : window.LinkTool,
+                        config: {
+                            endpoint: '{{ route("upload.image") }}',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        }
+                    } : undefined,
+                    // Delimiter tool
+                    delimiter: (typeof Delimiter !== 'undefined' || typeof window.Delimiter !== 'undefined') ? 
+                        (typeof Delimiter !== 'undefined' ? Delimiter : window.Delimiter) : undefined,
+                    // Warning tool
+                    warning: (typeof Warning !== 'undefined' || typeof window.Warning !== 'undefined') ? {
+                        class: typeof Warning !== 'undefined' ? Warning : window.Warning,
+                        inlineToolbar: true,
+                        shortcut: 'CMD+SHIFT+W',
+                        config: {
+                            titlePlaceholder: 'Title',
+                            messagePlaceholder: 'Message',
+                        }
+                    } : undefined,
+                    // Image tool
+                    image: (typeof ImageTool !== 'undefined' || typeof window.ImageTool !== 'undefined') ? {
+                        class: typeof ImageTool !== 'undefined' ? ImageTool : window.ImageTool,
+                        config: {
+                            uploader: {
+                                uploadByFile(file) {
+                                    return new Promise((resolve, reject) => {
+                                        console.log('Starting image upload...', file.name, file.size);
+                                        
+                                        const formData = new FormData();
+                                        formData.append('file', file);
+                                        
+                                        const xhr = new XMLHttpRequest();
+                                        xhr.open('POST', '{{ route("upload.image") }}');
+                                        xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                                        
+                                        xhr.onload = function() {
+                                            console.log('Upload response status:', xhr.status);
+                                            console.log('Upload response:', xhr.responseText);
+                                            
+                                            if (xhr.status === 200 || xhr.status === 201) {
+                                                try {
+                                                    const response = JSON.parse(xhr.responseText);
+                                                    if (response.success === 1 && response.file && response.file.url) {
+                                                        console.log('Upload successful:', response.file.url);
+                                                        resolve({
+                                                            success: 1,
+                                                            file: {
+                                                                url: response.file.url,
+                                                                caption: response.file.caption || '',
+                                                                withBorder: response.file.withBorder || false,
+                                                                withBackground: response.file.withBackground || false,
+                                                                stretched: response.file.stretched || false,
+                                                            }
+                                                        });
+                                                    } else {
+                                                        const errorMsg = response.error || 'Invalid response format';
+                                                        console.error('Upload failed:', errorMsg);
+                                                        reject(errorMsg);
+                                                    }
+                                                } catch (e) {
+                                                    console.error('Failed to parse response:', e);
+                                                    reject('Failed to parse response: ' + e.message);
+                                                }
+                                            } else {
+                                                // Try to parse error response
+                                                let errorMsg = 'Upload failed with status: ' + xhr.status;
+                                                try {
+                                                    const errorResponse = JSON.parse(xhr.responseText);
+                                                    if (errorResponse.error) {
+                                                        errorMsg = errorResponse.error;
+                                                    }
+                                                } catch (e) {
+                                                    // Use default error message
+                                                }
+                                                console.error('Upload failed:', errorMsg);
+                                                reject(errorMsg);
+                                            }
+                                        };
+                                        
+                                        xhr.onerror = function() {
+                                            console.error('Network error during upload');
+                                            reject('Network error during upload. Please check your connection.');
+                                        };
+                                        
+                                        xhr.ontimeout = function() {
+                                            console.error('Upload timeout');
+                                            reject('Upload timeout. Please try again.');
+                                        };
+                                        
+                                        // Set timeout to 30 seconds
+                                        xhr.timeout = 30000;
+                                        
+                                        xhr.send(formData);
+                                    });
+                                },
+                                uploadByUrl(url) {
+                                    // For existing images, just return the URL
+                                    return Promise.resolve({
+                                        success: 1,
+                                        file: {
+                                            url: url,
+                                            caption: '',
+                                            withBorder: false,
+                                            withBackground: false,
+                                            stretched: false,
+                                        }
+                                    });
+                                }
+                            },
+                            captionPlaceholder: 'Enter a caption',
+                            buttonContent: 'Select an Image',
+                            field: 'file',
+                            types: 'image/*'
+                        }
+                    } : undefined
+                };
+            
+            // Remove undefined tools
+            Object.keys(toolsConfig).forEach(key => {
+                if (toolsConfig[key] === undefined) {
+                    delete toolsConfig[key];
+                }
             });
-        },
-        
-        // Image Upload Configuration
-        images_upload_url: '{{ route("upload.image") }}',
-        images_upload_handler: function (blobInfo, success, failure) {
-            let xhr, formData;
-            xhr = new XMLHttpRequest();
-            xhr.withCredentials = false;
-            xhr.open('POST', '{{ route("upload.image") }}');
             
-            // Add CSRF token
-            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            console.log('Available tools:', Object.keys(toolsConfig));
             
-            xhr.onload = function() {
-                if (xhr.status != 200) {
-                    failure('HTTP Error: ' + xhr.status);
-                    return;
+            editor = new EditorJSClass({
+                holder: 'editorjs',
+                placeholder: 'Start typing your question... Press Tab to select a Block',
+                autofocus: true,
+                tools: toolsConfig,
+                data: @json(old('question_text') ? json_decode(old('question_text'), true) : null),
+                onReady: function() {
+                    console.log('Editor.js is ready and clickable');
+                    // Focus the editor
+                    const editorElement = document.getElementById('editorjs');
+                    if (editorElement) {
+                        editorElement.style.cursor = 'text';
+                    }
+                },
+                onChange: function() {
+                    console.log('Editor.js content changed');
                 }
-                let json = JSON.parse(xhr.responseText);
-                if (!json || typeof json.location != 'string') {
-                    failure('Invalid JSON: ' + xhr.responseText);
-                    return;
-                }
-                success(json.location);
-            };
+            });
             
-            formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename());
-            
-            xhr.send(formData);
-        },
-        
-        // Table Configuration
-        table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-        table_appearance_options: true,
-        table_grid: true,
-        table_style_by_css: true,
+            console.log('Editor.js initialized successfully');
+        } catch (error) {
+            console.error('Error initializing Editor.js:', error);
+            console.error('Error details:', error.message, error.stack);
+            const editorElement = document.getElementById('editorjs');
+            if (editorElement) {
+                editorElement.innerHTML = '<div class="p-4 text-red-500"><p>Error loading editor: ' + error.message + '</p><p class="text-sm mt-2">Please check browser console for details.</p></div>';
+            }
+        }
     });
 
     // Dynamic Options Management
@@ -345,65 +719,50 @@
         });
     }
 
-    // Form submission validation and TinyMCE content sync
+    // Form submission validation and Editor.js content sync
     const form = document.getElementById('questionForm');
     if (form) {
-        form.addEventListener('submit', function(e) {
-            const textarea = document.getElementById('question_text');
-            let editor = null;
-            let hasContent = false;
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Try to get TinyMCE editor instance
-            if (typeof tinymce !== 'undefined') {
-                try {
-                    editor = tinymce.get('question_text');
-                    if (editor) {
-                        // Get content from TinyMCE editor and sync to textarea
-                        const content = editor.getContent();
-                        if (textarea) {
-                            textarea.value = content;
+            try {
+                // Save Editor.js content
+                const outputData = await editor.save();
+                
+                // Check if content is not empty
+                const hasContent = outputData.blocks && outputData.blocks.length > 0 && 
+                    outputData.blocks.some(block => {
+                        if (block.type === 'paragraph' || block.type === 'header') {
+                            return block.data && block.data.text && block.data.text.trim().length > 0;
                         }
-                        
-                        // Check if content is not empty (strip HTML tags and whitespace)
-                        const textContent = editor.getContent({ format: 'text' }).trim();
-                        if (textContent) {
-                            hasContent = true;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error getting TinyMCE content:', error);
-                }
-            }
-            
-            // Fallback: check textarea directly if TinyMCE didn't work
-            if (!hasContent && textarea) {
-                const textareaValue = textarea.value.trim();
-                if (textareaValue) {
-                    hasContent = true;
-                }
-            }
-            
-            // Validate question text
+                        return true;
+                    });
+                
             if (!hasContent) {
-                e.preventDefault();
                 alert('Please enter question text!');
-                if (editor) {
-                    editor.focus();
-                } else if (textarea) {
-                    textarea.focus();
+                    return false;
                 }
-                return false;
+                
+                // Serialize Editor.js JSON to hidden input
+                const hiddenInput = document.getElementById('question_text');
+                if (hiddenInput) {
+                    hiddenInput.value = JSON.stringify(outputData);
             }
             
             // Validate correct option selection
             const correctOption = document.querySelector('input[name="correct_option"]:checked');
             if (!correctOption) {
-                e.preventDefault();
                 alert('Please select the correct answer!');
+                    return false;
+                }
+                
+                // Submit the form
+                form.submit();
+            } catch (error) {
+                console.error('Error saving Editor.js content:', error);
+                alert('Error saving question content. Please try again.');
                 return false;
             }
-            
-            // If all validations pass, form will submit naturally with synced content
         });
     }
 </script>

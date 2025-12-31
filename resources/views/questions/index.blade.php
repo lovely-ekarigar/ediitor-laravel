@@ -82,7 +82,55 @@
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4">
                         <div class="text-sm font-medium text-gray-900">
-                            {{ Str::limit(strip_tags($question->question_text), 100) }}
+                            @php
+                                $previewText = '';
+                                $questionText = $question->question_text;
+                                
+                                // Try to parse as Editor.js JSON
+                                $decoded = json_decode($questionText, true);
+                                if (json_last_error() === JSON_ERROR_NONE && isset($decoded['blocks']) && is_array($decoded['blocks'])) {
+                                    // Extract text from Editor.js blocks
+                                    $texts = [];
+                                    foreach ($decoded['blocks'] as $block) {
+                                        if (isset($block['type']) && isset($block['data'])) {
+                                            switch ($block['type']) {
+                                                case 'paragraph':
+                                                case 'header':
+                                                    if (isset($block['data']['text'])) {
+                                                        $texts[] = strip_tags($block['data']['text']);
+                                                    }
+                                                    break;
+                                                case 'list':
+                                                    if (isset($block['data']['items']) && is_array($block['data']['items'])) {
+                                                        foreach ($block['data']['items'] as $item) {
+                                                            $texts[] = strip_tags($item);
+                                                        }
+                                                    }
+                                                    break;
+                                                case 'checklist':
+                                                    if (isset($block['data']['items']) && is_array($block['data']['items'])) {
+                                                        foreach ($block['data']['items'] as $item) {
+                                                            if (isset($item['text'])) {
+                                                                $texts[] = strip_tags($item['text']);
+                                                            }
+                                                        }
+                                                    }
+                                                    break;
+                                                case 'quote':
+                                                    if (isset($block['data']['text'])) {
+                                                        $texts[] = strip_tags($block['data']['text']);
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                    $previewText = implode(' ', $texts);
+                                } else {
+                                    // Fallback: treat as HTML
+                                    $previewText = strip_tags($questionText);
+                                }
+                            @endphp
+                            {{ Str::limit($previewText, 100) }}
                         </div>
                     </td>
                     <td class="px-6 py-4">

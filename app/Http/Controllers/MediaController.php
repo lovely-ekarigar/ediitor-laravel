@@ -8,15 +8,22 @@ use Illuminate\Support\Facades\Storage;
 class MediaController extends Controller
 {
     /**
-     * Handle image upload from TinyMCE.
+     * Handle image upload from Editor.js.
      */
     public function uploadImage(Request $request)
     {
-        $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120', // Increased to 5MB
+            ]);
 
-        if ($request->hasFile('file')) {
+            if (!$request->hasFile('file')) {
+                return response()->json([
+                    'success' => 0,
+                    'error' => 'No file uploaded'
+                ], 400);
+            }
+
             $image = $request->file('file');
             
             // Generate unique filename
@@ -25,12 +32,41 @@ class MediaController extends Controller
             // Store image in storage/app/public/questions
             $path = $image->storeAs('questions', $filename, 'public');
             
-            // Return JSON response with the image URL
+            if (!$path) {
+                return response()->json([
+                    'success' => 0,
+                    'error' => 'Failed to store image'
+                ], 500);
+            }
+            
+            // Return Editor.js format JSON response
             return response()->json([
-                'location' => asset('storage/' . $path)
+                'success' => 1,
+                'file' => [
+                    'url' => asset('storage/' . $path),
+                    'caption' => '',
+                    'withBorder' => false,
+                    'withBackground' => false,
+                    'stretched' => false,
+                ]
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            $errors = $e->errors();
+            $firstError = collect($errors)->flatten()->first();
+            
+            return response()->json([
+                'success' => 0,
+                'error' => $firstError ?? 'Validation failed'
+            ], 422);
+        } catch (\Exception $e) {
+            // Handle other errors
+            \Log::error('Image upload error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => 0,
+                'error' => 'Upload failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['error' => 'No file uploaded'], 400);
     }
 }

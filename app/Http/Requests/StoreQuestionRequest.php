@@ -23,7 +23,34 @@ class StoreQuestionRequest extends FormRequest
     {
         return [
             'category_id' => 'required|exists:categories,id',
-            'question_text' => 'required|string',
+            'question_text' => ['required', 'string', function ($attribute, $value, $fail) {
+                // Validate JSON structure for Editor.js format
+                $decoded = json_decode($value, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $fail('The question text must be valid JSON.');
+                    return;
+                }
+                if (!isset($decoded['blocks']) || !is_array($decoded['blocks'])) {
+                    $fail('The question text must be in Editor.js format with blocks array.');
+                    return;
+                }
+                // Check if at least one block has content
+                $hasContent = false;
+                foreach ($decoded['blocks'] as $block) {
+                    if (isset($block['type']) && isset($block['data'])) {
+                        if (in_array($block['type'], ['paragraph', 'header']) && isset($block['data']['text']) && trim($block['data']['text']) !== '') {
+                            $hasContent = true;
+                            break;
+                        } elseif (!in_array($block['type'], ['paragraph', 'header'])) {
+                            $hasContent = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$hasContent) {
+                    $fail('The question text must contain at least one block with content.');
+                }
+            }],
             'difficulty' => 'required|in:Easy,Medium,Hard',
             'marks' => 'nullable|integer|min:1',
             'status' => 'required|in:Draft,Published',

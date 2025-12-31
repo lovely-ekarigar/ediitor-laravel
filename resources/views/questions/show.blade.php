@@ -56,8 +56,8 @@
     <!-- Question Text -->
     <div class="p-6 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900 mb-3">Question:</h3>
-        <div class="prose max-w-none bg-gray-50 p-4 rounded-lg">
-            {!! $question->question_text !!}
+        <div class="prose max-w-none bg-gray-50 p-4 rounded-lg" id="questionContent">
+            <div id="editorjs-output"></div>
         </div>
     </div>
 
@@ -110,4 +110,138 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Function to render Editor.js JSON to HTML
+    function renderEditorJsToHtml(blocks) {
+        if (!blocks || !Array.isArray(blocks)) {
+            return '';
+        }
+
+        let html = '';
+        
+        blocks.forEach(block => {
+            switch (block.type) {
+                case 'header':
+                    const level = block.data.level || 3;
+                    const headerText = block.data.text || '';
+                    html += `<h${level}>${escapeHtml(headerText)}</h${level}>`;
+                    break;
+                    
+                case 'paragraph':
+                    const paragraphText = block.data.text || '';
+                    html += `<p>${escapeHtml(paragraphText)}</p>`;
+                    break;
+                    
+                case 'list':
+                    const listItems = block.data.items || [];
+                    const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
+                    html += `<${listTag}>`;
+                    listItems.forEach(item => {
+                        html += `<li>${escapeHtml(item)}</li>`;
+                    });
+                    html += `</${listTag}>`;
+                    break;
+                    
+                case 'checklist':
+                    const checklistItems = block.data.items || [];
+                    html += '<ul class="checklist">';
+                    checklistItems.forEach(item => {
+                        const checked = item.checked ? 'checked' : '';
+                        html += `<li><input type="checkbox" ${checked} disabled> ${escapeHtml(item.text || '')}</li>`;
+                    });
+                    html += '</ul>';
+                    break;
+                    
+                case 'quote':
+                    const quoteText = block.data.text || '';
+                    const quoteCaption = block.data.caption || '';
+                    html += '<blockquote>';
+                    html += `<p>${escapeHtml(quoteText)}</p>`;
+                    if (quoteCaption) {
+                        html += `<cite>${escapeHtml(quoteCaption)}</cite>`;
+                    }
+                    html += '</blockquote>';
+                    break;
+                    
+                case 'code':
+                    const codeText = block.data.code || '';
+                    html += `<pre><code>${escapeHtml(codeText)}</code></pre>`;
+                    break;
+                    
+                case 'table':
+                    const tableContent = block.data.content || [];
+                    html += '<table class="table-auto border-collapse border border-gray-300 w-full">';
+                    tableContent.forEach(row => {
+                        html += '<tr>';
+                        row.forEach(cell => {
+                            html += `<td class="border border-gray-300 p-2">${escapeHtml(cell)}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</table>';
+                    break;
+                    
+                case 'image':
+                    const imageUrl = block.data.file?.url || block.data.url || '';
+                    const imageCaption = block.data.caption || '';
+                    const withBorder = block.data.withBorder ? 'border-2 border-gray-400' : '';
+                    const withBackground = block.data.withBackground ? 'bg-gray-100' : '';
+                    const stretched = block.data.stretched ? 'w-full' : '';
+                    
+                    if (imageUrl) {
+                        html += `<figure class="${withBorder} ${withBackground} ${stretched} inline-block">`;
+                        html += `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageCaption)}" class="max-w-full h-auto">`;
+                        if (imageCaption) {
+                            html += `<figcaption class="text-sm text-gray-600 mt-2">${escapeHtml(imageCaption)}</figcaption>`;
+                        }
+                        html += '</figure>';
+                    }
+                    break;
+                    
+                case 'marker':
+                    const markerText = block.data.text || '';
+                    html += `<mark>${escapeHtml(markerText)}</mark>`;
+                    break;
+            }
+        });
+        
+        return html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Render question content
+    document.addEventListener('DOMContentLoaded', function() {
+        const questionText = @json($question->question_text);
+        const outputDiv = document.getElementById('editorjs-output');
+        
+        if (!questionText) {
+            outputDiv.innerHTML = '<p class="text-gray-500">No question text available.</p>';
+            return;
+        }
+
+        // Try to parse as Editor.js JSON
+        try {
+            const parsed = JSON.parse(questionText);
+            if (parsed && Array.isArray(parsed.blocks)) {
+                // Editor.js format
+                outputDiv.innerHTML = renderEditorJsToHtml(parsed.blocks);
+            } else {
+                // Invalid JSON, treat as HTML
+                outputDiv.innerHTML = questionText;
+            }
+        } catch (e) {
+            // Not JSON, treat as HTML (backward compatibility)
+            outputDiv.innerHTML = questionText;
+        }
+    });
+</script>
+@endpush
 @endsection

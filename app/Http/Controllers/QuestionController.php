@@ -11,16 +11,97 @@ use Illuminate\Http\Request;
 class QuestionController extends Controller
 {
     /**
+     * Extract plain text from Editor.js JSON blocks for search.
+     */
+    private function extractTextFromEditorJs($content)
+    {
+        if (empty($content)) {
+            return '';
+        }
+
+        // Try to parse as JSON (Editor.js format)
+        $decoded = json_decode($content, true);
+        if (json_last_error() === JSON_ERROR_NONE && isset($decoded['blocks']) && is_array($decoded['blocks'])) {
+            $texts = [];
+            foreach ($decoded['blocks'] as $block) {
+                if (isset($block['type']) && isset($block['data'])) {
+                    switch ($block['type']) {
+                        case 'paragraph':
+                        case 'header':
+                            if (isset($block['data']['text'])) {
+                                $texts[] = strip_tags($block['data']['text']);
+                            }
+                            break;
+                        case 'list':
+                            if (isset($block['data']['items']) && is_array($block['data']['items'])) {
+                                foreach ($block['data']['items'] as $item) {
+                                    $texts[] = strip_tags($item);
+                                }
+                            }
+                            break;
+                        case 'checklist':
+                            if (isset($block['data']['items']) && is_array($block['data']['items'])) {
+                                foreach ($block['data']['items'] as $item) {
+                                    if (isset($item['text'])) {
+                                        $texts[] = strip_tags($item['text']);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'quote':
+                            if (isset($block['data']['text'])) {
+                                $texts[] = strip_tags($block['data']['text']);
+                            }
+                            if (isset($block['data']['caption'])) {
+                                $texts[] = strip_tags($block['data']['caption']);
+                            }
+                            break;
+                        case 'table':
+                            if (isset($block['data']['content']) && is_array($block['data']['content'])) {
+                                foreach ($block['data']['content'] as $row) {
+                                    if (is_array($row)) {
+                                        foreach ($row as $cell) {
+                                            $texts[] = strip_tags($cell);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case 'code':
+                            if (isset($block['data']['code'])) {
+                                $texts[] = $block['data']['code'];
+                            }
+                            break;
+                    }
+                }
+            }
+            return implode(' ', $texts);
+        }
+
+        // Fallback: treat as HTML and strip tags
+        return strip_tags($content);
+    }
+
+    /**
      * Display a listing of questions.
      */
     public function index(Request $request)
     {
         $query = Question::with(['category', 'options']);
 
-        // Search functionality - case-insensitive search in question text
+        // Search functionality - handle both JSON (Editor.js) and HTML formats
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereRaw('LOWER(question_text) LIKE ?', ['%' . strtolower($search) . '%']);
+            $search = strtolower($request->search);
+            $query->where(function($q) use ($search) {
+                // Search in Editor.js JSON format
+                $q->whereRaw('LOWER(question_text) LIKE ?', ['%' . $search . '%'])
+                  // Also search in extracted text from JSON blocks
+                  ->orWhere(function($subQ) use ($search) {
+                      // This will search in the JSON structure
+                      $subQ->whereRaw('LOWER(question_text) LIKE ?', ['%"text":"%' . $search . '%'])
+                           ->orWhereRaw('LOWER(question_text) LIKE ?', ['%"items":["%' . $search . '%']);
+                  });
+            });
         }
 
         // Filter by category
