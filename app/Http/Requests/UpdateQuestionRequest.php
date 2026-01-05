@@ -55,7 +55,43 @@ class UpdateQuestionRequest extends FormRequest
             'marks' => 'nullable|integer|min:1',
             'status' => 'required|in:Draft,Published',
             'options' => 'required|array|min:2',
-            'options.*.option_text' => 'required|string',
+            'options.*.option_text' => ['required', function ($attribute, $value, $fail) {
+                // Accept JSON (Editor.js format) or non-empty string
+                if (empty($value)) {
+                    $fail('The option text is required.');
+                    return;
+                }
+                
+                // Try to parse as JSON
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    // Valid JSON - check if it's Editor.js format
+                    if (isset($decoded['blocks']) && is_array($decoded['blocks'])) {
+                        // Check if at least one block has content
+                        $hasContent = false;
+                        foreach ($decoded['blocks'] as $block) {
+                            if (isset($block['type']) && isset($block['data'])) {
+                                if (in_array($block['type'], ['paragraph', 'header']) && isset($block['data']['text']) && trim($block['data']['text']) !== '') {
+                                    $hasContent = true;
+                                    break;
+                                } elseif (!in_array($block['type'], ['paragraph', 'header'])) {
+                                    $hasContent = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!$hasContent) {
+                            $fail('The option text must contain at least one block with content.');
+                        }
+                        return; // Valid Editor.js JSON
+                    }
+                }
+                
+                // Not JSON or invalid JSON - treat as string (backward compatibility)
+                if (!is_string($value) || trim($value) === '') {
+                    $fail('The option text must be valid JSON or a non-empty string.');
+                }
+            }],
             'options.*.is_correct' => 'nullable|boolean',
             'correct_option' => 'required|integer|min:0',
         ];

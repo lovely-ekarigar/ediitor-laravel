@@ -137,8 +137,8 @@
             <div id="optionsContainer" class="space-y-3">
                 <!-- Default 4 options -->
                 @for($i = 0; $i < 4; $i++)
-                    <div class="option-row flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="flex items-center">
+                    <div class="option-row flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200" data-option-index="{{ $i }}">
+                        <div class="flex items-center pt-2">
                             <input 
                                 type="radio" 
                                 name="correct_option" 
@@ -148,18 +148,14 @@
                             >
                         </div>
                         <div class="flex-1">
-                            <input 
-                                type="text" 
-                                name="options[{{ $i }}][option_text]" 
-                                placeholder="Enter option {{ $i + 1 }}"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                required
-                            >
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Option {{ $i + 1 }}</label>
+                            <div id="editorjs-option-{{ $i }}" class="border border-gray-300 rounded-lg bg-white min-h-[200px] p-3 @error('options.'.$i.'.option_text') border-red-500 @enderror" style="cursor: text;"></div>
+                            <input type="hidden" name="options[{{ $i }}][option_text]" id="option_text_{{ $i }}" value="">
                         </div>
                         <button 
                             type="button" 
                             onclick="removeOption(this)" 
-                            class="text-red-600 hover:text-red-800 transition"
+                            class="text-red-600 hover:text-red-800 transition mt-2"
                         >
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -283,6 +279,24 @@
     /* Make sure editor is visible */
     #editorjs .codex-editor {
         min-height: 400px;
+    }
+    
+    /* Option editor styling */
+    [id^="editorjs-option-"] {
+        min-height: 200px;
+    }
+    
+    [id^="editorjs-option-"] .ce-block__content {
+        max-width: 100%;
+    }
+    
+    [id^="editorjs-option-"] .ce-toolbar__content {
+        max-width: 100%;
+    }
+    
+    [id^="editorjs-option-"] .ce-paragraph {
+        cursor: text;
+        min-height: 1.5em;
     }
 </style>
 @endpush
@@ -653,15 +667,266 @@
         }
     });
 
+    // Store all option editors
+    const optionEditors = {};
+
+    // Function to initialize Editor.js for an option
+    async function initOptionEditor(index, existingData = null) {
+        const editorId = `editorjs-option-${index}`;
+        const editorElement = document.getElementById(editorId);
+        
+        if (!editorElement) {
+            console.warn(`Editor element not found: ${editorId}`);
+            return;
+        }
+
+        // Get EditorJS class
+        let EditorJSClass = undefined;
+        if (typeof EditorJS !== 'undefined') {
+            EditorJSClass = EditorJS;
+        } else if (typeof window.EditorJS !== 'undefined') {
+            EditorJSClass = window.EditorJS;
+        }
+
+        if (!EditorJSClass) {
+            console.error('EditorJS class not found for option editor');
+            return;
+        }
+
+        // Build tools config (full feature set - same as question editor)
+        const toolsConfig = {
+            // Paragraph tool (default, supports inline formatting)
+            paragraph: (typeof Paragraph !== 'undefined' || typeof window.Paragraph !== 'undefined') ? {
+                class: typeof Paragraph !== 'undefined' ? Paragraph : window.Paragraph,
+                inlineToolbar: true,
+                config: {
+                    placeholder: 'Enter option text...'
+                }
+            } : undefined,
+            // Header tool
+            header: (typeof Header !== 'undefined' || typeof window.Header !== 'undefined') ? {
+                class: typeof Header !== 'undefined' ? Header : window.Header,
+                config: {
+                    levels: [1, 2, 3, 4, 5, 6],
+                    defaultLevel: 3,
+                    placeholder: 'Enter a header'
+                },
+                inlineToolbar: true,
+                shortcut: 'CMD+SHIFT+H'
+            } : undefined,
+            // List tool
+            list: (typeof List !== 'undefined' || typeof window.List !== 'undefined') ? {
+                class: typeof List !== 'undefined' ? List : window.List,
+                inlineToolbar: true,
+                config: {
+                    defaultStyle: 'unordered'
+                },
+                shortcut: 'CMD+SHIFT+L'
+            } : undefined,
+            // Checklist tool
+            checklist: (typeof Checklist !== 'undefined' || typeof window.Checklist !== 'undefined') ? {
+                class: typeof Checklist !== 'undefined' ? Checklist : window.Checklist,
+                inlineToolbar: true,
+                shortcut: 'CMD+SHIFT+C'
+            } : undefined,
+            // Table tool
+            table: (typeof Table !== 'undefined' || typeof window.Table !== 'undefined') ? {
+                class: typeof Table !== 'undefined' ? Table : window.Table,
+                inlineToolbar: true,
+                config: {
+                    rows: 2,
+                    cols: 2,
+                    withHeadings: true
+                },
+                shortcut: 'CMD+ALT+T'
+            } : undefined,
+            // Quote tool
+            quote: (typeof Quote !== 'undefined' || typeof window.Quote !== 'undefined') ? {
+                class: typeof Quote !== 'undefined' ? Quote : window.Quote,
+                inlineToolbar: true,
+                shortcut: 'CMD+SHIFT+O',
+                config: {
+                    quotePlaceholder: 'Enter a quote',
+                    captionPlaceholder: 'Quote\'s author',
+                }
+            } : undefined,
+            // Marker tool (highlighting)
+            marker: (typeof Marker !== 'undefined' || typeof window.Marker !== 'undefined') ? {
+                class: typeof Marker !== 'undefined' ? Marker : window.Marker,
+                shortcut: 'CMD+SHIFT+M',
+            } : undefined,
+            // Code tool
+            code: (typeof Code !== 'undefined' || typeof window.Code !== 'undefined') ? {
+                class: typeof Code !== 'undefined' ? Code : window.Code,
+                config: {
+                    placeholder: 'Enter code',
+                },
+                shortcut: 'CMD+SHIFT+C'
+            } : undefined,
+            // Inline Code tool
+            inlineCode: (typeof InlineCode !== 'undefined' || typeof window.InlineCode !== 'undefined') ? {
+                class: typeof InlineCode !== 'undefined' ? InlineCode : window.InlineCode,
+                shortcut: 'CMD+SHIFT+M',
+            } : undefined,
+            // Link tool
+            linkTool: (typeof LinkTool !== 'undefined' || typeof window.LinkTool !== 'undefined') ? {
+                class: typeof LinkTool !== 'undefined' ? LinkTool : window.LinkTool,
+                config: {
+                    endpoint: '{{ route("upload.image") }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }
+            } : undefined,
+            // Delimiter tool
+            delimiter: (typeof Delimiter !== 'undefined' || typeof window.Delimiter !== 'undefined') ? 
+                (typeof Delimiter !== 'undefined' ? Delimiter : window.Delimiter) : undefined,
+            // Warning tool
+            warning: (typeof Warning !== 'undefined' || typeof window.Warning !== 'undefined') ? {
+                class: typeof Warning !== 'undefined' ? Warning : window.Warning,
+                inlineToolbar: true,
+                shortcut: 'CMD+SHIFT+W',
+                config: {
+                    titlePlaceholder: 'Title',
+                    messagePlaceholder: 'Message',
+                }
+            } : undefined,
+            // Image tool
+            image: (typeof ImageTool !== 'undefined' || typeof window.ImageTool !== 'undefined') ? {
+                class: typeof ImageTool !== 'undefined' ? ImageTool : window.ImageTool,
+                config: {
+                    uploader: {
+                        uploadByFile(file) {
+                            return new Promise((resolve, reject) => {
+                                console.log('Starting image upload...', file.name, file.size);
+                                
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                
+                                const xhr = new XMLHttpRequest();
+                                xhr.open('POST', '{{ route("upload.image") }}');
+                                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                                
+                                xhr.onload = function() {
+                                    console.log('Upload response status:', xhr.status);
+                                    console.log('Upload response:', xhr.responseText);
+                                    
+                                    if (xhr.status === 200 || xhr.status === 201) {
+                                        try {
+                                            const response = JSON.parse(xhr.responseText);
+                                            if (response.success === 1 && response.file && response.file.url) {
+                                                console.log('Upload successful:', response.file.url);
+                                                resolve({
+                                                    success: 1,
+                                                    file: {
+                                                        url: response.file.url,
+                                                        caption: response.file.caption || '',
+                                                        withBorder: response.file.withBorder || false,
+                                                        withBackground: response.file.withBackground || false,
+                                                        stretched: response.file.stretched || false,
+                                                    }
+                                                });
+                                            } else {
+                                                const errorMsg = response.error || 'Invalid response format';
+                                                console.error('Upload failed:', errorMsg);
+                                                reject(errorMsg);
+                                            }
+                                        } catch (e) {
+                                            console.error('Failed to parse response:', e);
+                                            reject('Failed to parse response: ' + e.message);
+                                        }
+                                    } else {
+                                        // Try to parse error response
+                                        let errorMsg = 'Upload failed with status: ' + xhr.status;
+                                        try {
+                                            const errorResponse = JSON.parse(xhr.responseText);
+                                            if (errorResponse.error) {
+                                                errorMsg = errorResponse.error;
+                                            }
+                                        } catch (e) {
+                                            // Use default error message
+                                        }
+                                        console.error('Upload failed:', errorMsg);
+                                        reject(errorMsg);
+                                    }
+                                };
+                                
+                                xhr.onerror = function() {
+                                    console.error('Network error during upload');
+                                    reject('Network error during upload. Please check your connection.');
+                                };
+                                
+                                xhr.ontimeout = function() {
+                                    console.error('Upload timeout');
+                                    reject('Upload timeout. Please try again.');
+                                };
+                                
+                                // Set timeout to 30 seconds
+                                xhr.timeout = 30000;
+                                
+                                xhr.send(formData);
+                            });
+                        },
+                        uploadByUrl(url) {
+                            // For existing images, just return the URL
+                            return Promise.resolve({
+                                success: 1,
+                                file: {
+                                    url: url,
+                                    caption: '',
+                                    withBorder: false,
+                                    withBackground: false,
+                                    stretched: false,
+                                }
+                            });
+                        }
+                    },
+                    captionPlaceholder: 'Enter a caption',
+                    buttonContent: 'Select an Image',
+                    field: 'file',
+                    types: 'image/*'
+                }
+            } : undefined
+        };
+
+        // Remove undefined tools
+        Object.keys(toolsConfig).forEach(key => {
+            if (toolsConfig[key] === undefined) {
+                delete toolsConfig[key];
+            }
+        });
+
+        try {
+            optionEditors[index] = new EditorJSClass({
+                holder: editorId,
+                placeholder: 'Enter option text...',
+                tools: toolsConfig,
+                data: existingData,
+                minHeight: 200,
+            });
+        } catch (error) {
+            console.error(`Error initializing option editor ${index}:`, error);
+        }
+    }
+
+    // Initialize all option editors after main editor is ready
+    waitForEditorJS(function() {
+        // Initialize editors for default 4 options
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => initOptionEditor(i), i * 100); // Stagger initialization
+        }
+    });
+
     // Dynamic Options Management
     let optionIndex = 4;
 
     function addOption() {
         const container = document.getElementById('optionsContainer');
         const optionRow = document.createElement('div');
-        optionRow.className = 'option-row flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200';
+        optionRow.className = 'option-row flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200';
+        optionRow.setAttribute('data-option-index', optionIndex);
         optionRow.innerHTML = `
-            <div class="flex items-center">
+            <div class="flex items-center pt-2">
                 <input 
                     type="radio" 
                     name="correct_option" 
@@ -670,18 +935,14 @@
                 >
             </div>
             <div class="flex-1">
-                <input 
-                    type="text" 
-                    name="options[${optionIndex}][option_text]" 
-                    placeholder="Enter option ${optionIndex + 1}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required
-                >
+                <label class="block text-sm font-medium text-gray-700 mb-2">Option ${optionIndex + 1}</label>
+                <div id="editorjs-option-${optionIndex}" class="border border-gray-300 rounded-lg bg-white min-h-[200px] p-3" style="cursor: text;"></div>
+                <input type="hidden" name="options[${optionIndex}][option_text]" id="option_text_${optionIndex}" value="">
             </div>
             <button 
                 type="button" 
                 onclick="removeOption(this)" 
-                class="text-red-600 hover:text-red-800 transition"
+                class="text-red-600 hover:text-red-800 transition mt-2"
             >
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -689,8 +950,14 @@
             </button>
         `;
         container.appendChild(optionRow);
+        
+        // Initialize Editor.js for the new option
+        setTimeout(() => {
+            initOptionEditor(optionIndex);
+            updateOptionIndices();
+        }, 100);
+        
         optionIndex++;
-        updateOptionIndices();
     }
 
     function removeOption(button) {
@@ -698,7 +965,20 @@
         const options = container.querySelectorAll('.option-row');
         
         if (options.length > 2) {
-            button.closest('.option-row').remove();
+            const optionRow = button.closest('.option-row');
+            const index = parseInt(optionRow.getAttribute('data-option-index'));
+            
+            // Destroy editor instance if exists
+            if (optionEditors[index]) {
+                try {
+                    optionEditors[index].destroy();
+                } catch (e) {
+                    console.warn('Error destroying editor:', e);
+                }
+                delete optionEditors[index];
+            }
+            
+            optionRow.remove();
             updateOptionIndices();
         } else {
             alert('You must have at least 2 options!');
@@ -711,11 +991,28 @@
         
         options.forEach((option, index) => {
             const radio = option.querySelector('input[type="radio"]');
-            const textInput = option.querySelector('input[type="text"]');
+            const label = option.querySelector('label');
+            const editorId = option.querySelector('[id^="editorjs-option-"]');
+            const hiddenInput = option.querySelector('[id^="option_text_"]');
             
-            radio.value = index;
-            textInput.name = `options[${index}][option_text]`;
-            textInput.placeholder = `Enter option ${index + 1}`;
+            if (radio) radio.value = index;
+            if (label) label.textContent = `Option ${index + 1}`;
+            if (editorId) {
+                const oldIndex = editorId.id.match(/\d+/)?.[0];
+                if (oldIndex !== index.toString()) {
+                    editorId.id = `editorjs-option-${index}`;
+                    // Update editor reference
+                    if (optionEditors[oldIndex]) {
+                        optionEditors[index] = optionEditors[oldIndex];
+                        delete optionEditors[oldIndex];
+                    }
+                }
+            }
+            if (hiddenInput) {
+                hiddenInput.id = `option_text_${index}`;
+                hiddenInput.name = `options[${index}][option_text]`;
+            }
+            option.setAttribute('data-option-index', index);
         });
     }
 
@@ -726,10 +1023,10 @@
             e.preventDefault();
             
             try {
-                // Save Editor.js content
+                // Save main question Editor.js content
                 const outputData = await editor.save();
                 
-                // Check if content is not empty
+                // Check if question content is not empty
                 const hasContent = outputData.blocks && outputData.blocks.length > 0 && 
                     outputData.blocks.some(block => {
                         if (block.type === 'paragraph' || block.type === 'header') {
@@ -738,21 +1035,63 @@
                         return true;
                     });
                 
-            if (!hasContent) {
-                alert('Please enter question text!');
+                if (!hasContent) {
+                    alert('Please enter question text!');
                     return false;
                 }
                 
-                // Serialize Editor.js JSON to hidden input
+                // Serialize question Editor.js JSON to hidden input
                 const hiddenInput = document.getElementById('question_text');
                 if (hiddenInput) {
                     hiddenInput.value = JSON.stringify(outputData);
-            }
-            
-            // Validate correct option selection
-            const correctOption = document.querySelector('input[name="correct_option"]:checked');
-            if (!correctOption) {
-                alert('Please select the correct answer!');
+                }
+                
+                // Save all option Editor.js content
+                const optionRows = document.querySelectorAll('.option-row');
+                let hasEmptyOption = false;
+                
+                for (let i = 0; i < optionRows.length; i++) {
+                    const optionRow = optionRows[i];
+                    const index = parseInt(optionRow.getAttribute('data-option-index'));
+                    const optionEditor = optionEditors[index];
+                    const hiddenInput = document.getElementById(`option_text_${index}`);
+                    
+                    if (optionEditor && hiddenInput) {
+                        try {
+                            const optionData = await optionEditor.save();
+                            
+                            // Check if option has content
+                            const hasOptionContent = optionData.blocks && optionData.blocks.length > 0 && 
+                                optionData.blocks.some(block => {
+                                    if (block.type === 'paragraph' || block.type === 'header') {
+                                        return block.data && block.data.text && block.data.text.trim().length > 0;
+                                    }
+                                    return true;
+                                });
+                            
+                            if (!hasOptionContent) {
+                                hasEmptyOption = true;
+                                alert(`Please enter text for Option ${i + 1}!`);
+                                return false;
+                            }
+                            
+                            hiddenInput.value = JSON.stringify(optionData);
+                        } catch (error) {
+                            console.error(`Error saving option ${index}:`, error);
+                            alert(`Error saving option ${i + 1}. Please try again.`);
+                            return false;
+                        }
+                    } else if (hiddenInput && !hiddenInput.value) {
+                        hasEmptyOption = true;
+                        alert(`Please enter text for Option ${i + 1}!`);
+                        return false;
+                    }
+                }
+                
+                // Validate correct option selection
+                const correctOption = document.querySelector('input[name="correct_option"]:checked');
+                if (!correctOption) {
+                    alert('Please select the correct answer!');
                     return false;
                 }
                 

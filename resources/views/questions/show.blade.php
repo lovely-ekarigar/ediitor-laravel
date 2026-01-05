@@ -78,7 +78,7 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-gray-900 font-medium">Option {{ $index + 1 }}</p>
-                        <p class="text-gray-700 mt-1">{{ $option->option_text }}</p>
+                        <div class="text-gray-700 mt-1 prose max-w-none" id="option-content-{{ $index }}"></div>
                         @if($option->is_correct)
                             <span class="inline-block mt-2 px-2 py-1 text-xs font-semibold rounded bg-green-200 text-green-800">
                                 Correct Answer
@@ -241,6 +241,30 @@
             // Not JSON, treat as HTML (backward compatibility)
             outputDiv.innerHTML = questionText;
         }
+        
+        // Render option content
+        const options = @json($question->options);
+        options.forEach((option, index) => {
+            const optionDiv = document.getElementById(`option-content-${index}`);
+            if (!optionDiv || !option.option_text) {
+                return;
+            }
+            
+            // Try to parse as Editor.js JSON
+            try {
+                const parsed = JSON.parse(option.option_text);
+                if (parsed && Array.isArray(parsed.blocks)) {
+                    // Editor.js format
+                    optionDiv.innerHTML = renderEditorJsToHtml(parsed.blocks);
+                } else {
+                    // Invalid JSON, treat as HTML
+                    optionDiv.innerHTML = option.option_text;
+                }
+            } catch (e) {
+                // Not JSON, treat as HTML or plain text (backward compatibility)
+                optionDiv.innerHTML = option.option_text;
+            }
+        });
     });
 </script>
 @endpush
