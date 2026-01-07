@@ -364,6 +364,44 @@
         return null;
     }
     
+    // Function to parse option content (JSON or HTML/plain text)
+    function parseOptionContent(content) {
+        if (!content) {
+            return null;
+        }
+        
+        // Try to parse as JSON
+        try {
+            const parsed = JSON.parse(content);
+            // Check if it's Editor.js format (has blocks array)
+            if (parsed && typeof parsed === 'object' && Array.isArray(parsed.blocks)) {
+                return parsed;
+            }
+        } catch (e) {
+            // Not JSON, treat as HTML or plain text
+        }
+        
+        // If HTML or plain text, convert to Editor.js format
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content || '';
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        if (textContent.trim()) {
+            return {
+                blocks: [
+                    {
+                        type: 'paragraph',
+                        data: {
+                            text: textContent.trim()
+                        }
+                    }
+                ]
+            };
+        }
+        
+        return null;
+    }
+    
     // Function to check if all required tools are loaded
     function checkToolsLoaded() {
         // Check for EditorJS - try multiple ways it might be exposed
