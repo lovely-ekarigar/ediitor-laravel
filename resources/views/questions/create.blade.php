@@ -3,12 +3,12 @@
 @section('title', 'Create Question')
 
 @section('content')
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Question</h1>
-    <p class="text-gray-600">Add a new question to your question bank</p>
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create New Question</h1>
+    <p class="text-sm sm:text-base text-gray-600">Add a new question to your question bank</p>
 </div>
 
-<div class="bg-white rounded-xl shadow-md p-8">
+<div class="bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
     <form action="{{ route('questions.store') }}" method="POST" id="questionForm" novalidate>
         @csrf
 
@@ -117,7 +117,7 @@
 
         <!-- Options Section -->
         <div class="mb-6">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                 <label class="block text-sm font-semibold text-gray-700">
                     Answer Options <span class="text-red-500">*</span>
                     <span class="text-xs text-gray-500 font-normal">(Minimum 2 required)</span>
@@ -125,7 +125,7 @@
                 <button 
                     type="button" 
                     onclick="addOption()" 
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg"
+                    class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg"
                 >
                     <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -137,8 +137,8 @@
             <div id="optionsContainer" class="space-y-3">
                 <!-- Default 4 options -->
                 @for($i = 0; $i < 4; $i++)
-                    <div class="option-row flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200" data-option-index="{{ $i }}">
-                        <div class="flex items-center pt-2">
+                    <div class="option-row flex flex-col sm:flex-row items-start gap-3 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200" data-option-index="{{ $i }}">
+                        <div class="flex items-center pt-2 sm:pt-0">
                             <input 
                                 type="radio" 
                                 name="correct_option" 
@@ -147,17 +147,17 @@
                                 {{ $i === 0 ? 'required' : '' }}
                             >
                         </div>
-                        <div class="flex-1">
+                        <div class="flex-1 w-full">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Option {{ $i + 1 }}</label>
-                            <div id="editorjs-option-{{ $i }}" class="border border-gray-300 rounded-lg bg-white min-h-[200px] p-3 @error('options.'.$i.'.option_text') border-red-500 @enderror" style="cursor: text;"></div>
+                            <div id="editorjs-option-{{ $i }}" class="border border-gray-300 rounded-lg bg-white min-h-[200px] p-2 sm:p-3 @error('options.'.$i.'.option_text') border-red-500 @enderror" style="cursor: text;"></div>
                             <input type="hidden" name="options[{{ $i }}][option_text]" id="option_text_{{ $i }}" value="">
                         </div>
                         <button 
                             type="button" 
                             onclick="removeOption(this)" 
-                            class="text-red-600 hover:text-red-800 transition mt-2"
+                            class="text-red-600 hover:text-red-800 transition mt-2 sm:mt-0 p-2"
                         >
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
                         </button>
@@ -179,13 +179,13 @@
         </div>
 
         <!-- Submit Buttons -->
-        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <a href="{{ route('questions.index') }}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+            <a href="{{ route('questions.index') }}" class="w-full sm:w-auto text-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
                 Cancel
             </a>
             <button 
                 type="submit" 
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-lg font-medium transition shadow-md hover:shadow-lg"
+                class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 sm:px-8 py-2 rounded-lg font-medium transition shadow-md hover:shadow-lg"
             >
                 Create Question
             </button>
