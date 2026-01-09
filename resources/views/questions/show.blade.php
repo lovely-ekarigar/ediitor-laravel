@@ -3,11 +3,11 @@
 @section('title', 'View Question')
 
 @section('content')
-<div class="mb-6 sm:mb-8">
+<div class="mb-6 sm:mb-8 lg:mb-8">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Question Details</h1>
-            <p class="text-sm sm:text-base text-gray-600">View full question information</p>
+            <h1 class="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900 mb-2">Question Details</h1>
+            <p class="text-sm sm:text-base lg:text-base text-gray-600">View full question information</p>
         </div>
         <a href="{{ route('questions.index') }}" class="w-full sm:w-auto text-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition">
             <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,10 +20,10 @@
 
 <div class="bg-white rounded-xl shadow-md">
     <!-- Question Header -->
-    <div class="border-b border-gray-200 p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="px-2 sm:px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+    <div class="border-b border-gray-200 p-4 sm:p-6 lg:p-8 xl:p-10">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 lg:gap-6 mb-4 lg:mb-6">
+            <div class="flex flex-wrap items-center gap-2 lg:gap-3">
+                <span class="px-2 sm:px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
                     {{ $question->category->name }}
                 </span>
                 @php
@@ -33,40 +33,40 @@
                         'Hard' => 'bg-red-100 text-red-800',
                     ];
                 @endphp
-                <span class="px-2 sm:px-3 py-1 text-xs font-semibold rounded-full {{ $difficultyColors[$question->difficulty] }}">
+                <span class="px-2 sm:px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold rounded-full {{ $difficultyColors[$question->difficulty] }}">
                     {{ $question->difficulty }}
                 </span>
                 @if($question->status === 'Published')
-                    <span class="px-2 sm:px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">
+                    <span class="px-2 sm:px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold rounded-full bg-emerald-100 text-emerald-800">
                         Published
                     </span>
                 @else
-                    <span class="px-2 sm:px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                    <span class="px-2 sm:px-3 lg:px-4 py-1 lg:py-1.5 text-xs lg:text-sm font-semibold rounded-full bg-gray-100 text-gray-800">
                         Draft
                     </span>
                 @endif
             </div>
             <div class="text-left sm:text-right">
-                <p class="text-xs sm:text-sm text-gray-500">Marks</p>
-                <p class="text-xl sm:text-2xl font-bold text-indigo-600">{{ $question->marks }}</p>
+                <p class="text-xs sm:text-sm lg:text-base text-gray-500">Marks</p>
+                <p class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-indigo-600">{{ $question->marks }}</p>
             </div>
         </div>
     </div>
 
     <!-- Question Text -->
-    <div class="p-4 sm:p-6 border-b border-gray-200">
-        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3">Question:</h3>
-        <div class="prose max-w-none bg-gray-50 p-3 sm:p-4 rounded-lg text-sm sm:text-base" id="questionContent">
+    <div class="p-4 sm:p-6 lg:p-6 border-b border-gray-200">
+        <h3 class="text-base sm:text-lg lg:text-lg font-semibold text-gray-900 mb-3">Question:</h3>
+        <div class="prose max-w-none bg-gray-50 p-3 sm:p-4 lg:p-5 rounded-lg text-sm sm:text-base lg:text-base" id="questionContent">
             <div id="editorjs-output"></div>
         </div>
     </div>
 
     <!-- Options -->
-    <div class="p-4 sm:p-6">
-        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-4">Answer Options:</h3>
+    <div class="p-4 sm:p-6 lg:p-6">
+        <h3 class="text-base sm:text-lg lg:text-lg font-semibold text-gray-900 mb-4">Answer Options:</h3>
         <div class="space-y-3">
             @foreach($question->options as $index => $option)
-                <div class="flex items-start p-3 sm:p-4 rounded-lg border-2 {{ $option->is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-gray-50' }}">
+                <div class="flex items-start p-3 sm:p-4 lg:p-4 rounded-lg border-2 {{ $option->is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-gray-50' }}">
                     <div class="flex-shrink-0 mr-2 sm:mr-3">
                         @if($option->is_correct)
                             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@
             @csrf
             @method('DELETE')
             <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-medium transition shadow-md hover:shadow-lg">
-                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 lg:w-5 lg:h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
                 Delete Question

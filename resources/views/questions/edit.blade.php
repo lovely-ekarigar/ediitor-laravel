@@ -3,25 +3,25 @@
 @section('title', 'Edit Question')
 
 @section('content')
-<div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Edit Question</h1>
-    <p class="text-sm sm:text-base text-gray-600">Update the question details</p>
+<div class="mb-6 sm:mb-8 lg:mb-8">
+    <h1 class="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900 mb-2">Edit Question</h1>
+    <p class="text-sm sm:text-base lg:text-base text-gray-600">Update the question details</p>
 </div>
 
-<div class="bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
+<div class="bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12">
     <form action="{{ route('questions.update', $question) }}" method="POST" id="questionForm" novalidate>
         @csrf
         @method('PUT')
 
         <!-- Category -->
         <div class="mb-6">
-            <label for="category_id" class="block text-sm font-semibold text-gray-700 mb-2">
+            <label for="category_id" class="block text-sm lg:text-base font-semibold text-gray-700 mb-2">
                 Category <span class="text-red-500">*</span>
             </label>
             <select 
                 name="category_id" 
                 id="category_id" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('category_id') border-red-500 @enderror"
+                class="w-full px-4 py-2 lg:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base @error('category_id') border-red-500 @enderror"
                 required
             >
                 <option value="">Select a category</option>
@@ -38,10 +38,10 @@
 
         <!-- Question Text -->
         <div class="mb-6">
-            <label for="question_text" class="block text-sm font-semibold text-gray-700 mb-2">
+            <label for="question_text" class="block text-sm lg:text-base font-semibold text-gray-700 mb-2">
                 Question Text <span class="text-red-500">*</span>
             </label>
-            <div id="editorjs" class="border border-gray-300 rounded-lg bg-white min-h-[400px] p-4 @error('question_text') border-red-500 @enderror" style="cursor: text;"></div>
+            <div id="editorjs" class="border border-gray-300 rounded-lg bg-white min-h-[400px] lg:min-h-[450px] p-4 @error('question_text') border-red-500 @enderror" style="cursor: text;"></div>
             <input type="hidden" name="question_text" id="question_text" value="{{ old('question_text', $question->question_text) }}">
             @error('question_text')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -52,20 +52,20 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Difficulty -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <label class="block text-sm lg:text-base font-semibold text-gray-700 mb-2">
                     Difficulty Level <span class="text-red-500">*</span>
                 </label>
                 <div class="space-y-2">
                     <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                        <input type="radio" name="difficulty" value="Easy" class="text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Easy' ? 'checked' : '' }} required>
+                        <input type="radio" name="difficulty" value="Easy" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Easy' ? 'checked' : '' }} required>
                         <span class="ml-3 text-sm font-medium text-gray-700">Easy</span>
                     </label>
                     <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                        <input type="radio" name="difficulty" value="Medium" class="text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Medium' ? 'checked' : '' }} required>
+                        <input type="radio" name="difficulty" value="Medium" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Medium' ? 'checked' : '' }} required>
                         <span class="ml-3 text-sm font-medium text-gray-700">Medium</span>
                     </label>
                     <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                        <input type="radio" name="difficulty" value="Hard" class="text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Hard' ? 'checked' : '' }} required>
+                        <input type="radio" name="difficulty" value="Hard" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" {{ old('difficulty', $question->difficulty) === 'Hard' ? 'checked' : '' }} required>
                         <span class="ml-3 text-sm font-medium text-gray-700">Hard</span>
                     </label>
                 </div>
@@ -78,7 +78,7 @@
             <div class="space-y-6">
                 <!-- Marks -->
                 <div>
-                    <label for="marks" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label for="marks" class="block text-sm lg:text-base font-semibold text-gray-700 mb-2">
                         Marks
                     </label>
                     <input 
@@ -87,7 +87,7 @@
                         id="marks" 
                         value="{{ old('marks', $question->marks) }}"
                         min="1"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('marks') border-red-500 @enderror"
+                        class="w-full px-4 py-2 lg:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base @error('marks') border-red-500 @enderror"
                     >
                     @error('marks')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -96,16 +96,16 @@
 
                 <!-- Status -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label class="block text-sm lg:text-base font-semibold text-gray-700 mb-2">
                         Status <span class="text-red-500">*</span>
                     </label>
                     <div class="space-y-2">
                         <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                            <input type="radio" name="status" value="Draft" class="text-indigo-600 focus:ring-indigo-500" {{ old('status', $question->status) === 'Draft' ? 'checked' : '' }} required>
+                            <input type="radio" name="status" value="Draft" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" {{ old('status', $question->status) === 'Draft' ? 'checked' : '' }} required>
                             <span class="ml-3 text-sm font-medium text-gray-700">Draft</span>
                         </label>
                         <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                            <input type="radio" name="status" value="Published" class="text-indigo-600 focus:ring-indigo-500" {{ old('status', $question->status) === 'Published' ? 'checked' : '' }} required>
+                            <input type="radio" name="status" value="Published" class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" {{ old('status', $question->status) === 'Published' ? 'checked' : '' }} required>
                             <span class="ml-3 text-sm font-medium text-gray-700">Published</span>
                         </label>
                     </div>
@@ -119,7 +119,7 @@
         <!-- Options Section -->
         <div class="mb-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                <label class="block text-sm font-semibold text-gray-700">
+                <label class="block text-sm lg:text-base font-semibold text-gray-700">
                     Answer Options <span class="text-red-500">*</span>
                     <span class="text-xs text-gray-500 font-normal">(Minimum 2 required)</span>
                 </label>
@@ -181,12 +181,12 @@
 
         <!-- Submit Buttons -->
         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
-            <a href="{{ route('questions.index') }}" class="w-full sm:w-auto text-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
+            <a href="{{ route('questions.index') }}" class="w-full sm:w-auto text-center px-6 py-2 border border-gray-300 rounded-lg text-gray-700 text-sm font-medium hover:bg-gray-50 transition">
                 Cancel
             </a>
             <button 
                 type="submit" 
-                class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 sm:px-8 py-2 rounded-lg font-medium transition shadow-md hover:shadow-lg"
+                class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 sm:px-8 py-2 rounded-lg text-sm font-medium transition shadow-md hover:shadow-lg"
             >
                 Update Question
             </button>

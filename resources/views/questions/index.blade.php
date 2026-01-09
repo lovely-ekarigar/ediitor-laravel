@@ -3,13 +3,13 @@
 @section('title', 'All Questions')
 
 @section('content')
-<div class="mb-6 sm:mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Question Bank</h1>
-    <p class="text-sm sm:text-base text-gray-600">Manage your exam questions and categories</p>
+<div class="mb-6 sm:mb-8 lg:mb-8">
+    <h1 class="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900 mb-2">Question Bank</h1>
+    <p class="text-sm sm:text-base lg:text-base text-gray-600">Manage your exam questions and categories</p>
 </div>
 
 <!-- Search and Filter -->
-<div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+<div class="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8 xl:p-10 mb-4 sm:mb-6 lg:mb-8">
     <form action="{{ route('questions.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Search -->
         <div class="md:col-span-2">
@@ -69,19 +69,19 @@
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gradient-to-r from-indigo-50 to-purple-50">
             <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Question</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Category</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Difficulty</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Marks</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-left text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Question</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-left text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Category</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-left text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Difficulty</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-left text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Marks</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-left text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                <th class="px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6 text-right text-xs lg:text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
             @forelse($questions as $question)
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">
+                    <td class="px-6 lg:px-8 py-4 lg:py-4">
+                        <div class="text-sm lg:text-base font-medium text-gray-900">
                             @php
                                 $previewText = '';
                                 $questionText = $question->question_text;
@@ -150,31 +150,31 @@
                             {{ $question->difficulty }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
+                    <td class="px-6 lg:px-8 py-4 lg:py-4 text-sm lg:text-base text-gray-900">
                         {{ $question->marks }}
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 lg:px-8 py-4 lg:py-4">
                         @if($question->status === 'Published')
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">
+                            <span class="px-3 py-1 inline-flex text-xs lg:text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">
                                 Published
                             </span>
                         @else
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                            <span class="px-3 py-1 inline-flex text-xs lg:text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                                 Draft
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-right text-sm font-medium space-x-3">
+                    <td class="px-6 lg:px-8 py-4 lg:py-4 text-right text-sm font-medium space-x-3">
                         <!-- View Button -->
                         <a href="{{ route('questions.show', $question) }}" class="text-gray-600 hover:text-gray-900 transition" title="View Details">
-                            <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
                         </a>
                         <!-- Edit Button -->
                         <a href="{{ route('questions.edit', $question) }}" class="text-indigo-600 hover:text-indigo-900 transition" title="Edit">
-                            <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </a>
@@ -183,7 +183,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-900 transition" title="Delete">
-                                <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
                             </button>
@@ -192,12 +192,12 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <td colspan="6" class="px-6 lg:px-8 xl:px-10 py-12 lg:py-16 xl:py-20 text-center">
+                        <svg class="w-16 h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 text-gray-300 mx-auto mb-4 lg:mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <p class="text-gray-500 text-lg font-medium">No questions found</p>
-                        <p class="text-gray-400 text-sm mt-1">Try adjusting your search or filters</p>
+                        <p class="text-gray-500 text-lg lg:text-xl xl:text-2xl font-medium">No questions found</p>
+                        <p class="text-gray-400 text-sm lg:text-base xl:text-lg mt-1 lg:mt-2">Try adjusting your search or filters</p>
                     </td>
                 </tr>
             @endforelse
@@ -206,7 +206,7 @@
 
     <!-- Pagination -->
     @if($questions->hasPages())
-        <div class="bg-gray-50 px-6 py-4">
+        <div class="bg-gray-50 px-6 lg:px-8 xl:px-10 py-4 lg:py-5 xl:py-6">
             {{ $questions->links() }}
         </div>
     @endif
@@ -269,40 +269,40 @@
                 'Hard' => 'bg-red-100 text-red-800',
             ];
         @endphp
-        <div class="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition">
-            <div class="mb-3">
-                <p class="text-sm font-medium text-gray-900 line-clamp-2">{{ Str::limit($previewText, 80) }}</p>
+        <div class="bg-white rounded-xl shadow-md p-4 lg:p-6 hover:shadow-lg transition">
+            <div class="mb-3 lg:mb-4">
+                <p class="text-sm lg:text-base font-sm text-gray-900 line-clamp-2">{{ Str::limit($previewText, 80) }}</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+            <div class="flex flex-wrap items-center gap-2 lg:gap-3 mb-3 lg:mb-4">
+                <span class="px-2 lg:px-3 py-1 text-xs lg:text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
                     {{ $question->category->name }}
                 </span>
-                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $difficultyColors[$question->difficulty] }}">
+                <span class="px-2 lg:px-3 py-1 text-xs lg:text-sm font-semibold rounded-full {{ $difficultyColors[$question->difficulty] }}">
                     {{ $question->difficulty }}
                 </span>
                 @if($question->status === 'Published')
-                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">
+                    <span class="px-2 lg:px-3 py-1 text-xs lg:text-sm font-semibold rounded-full bg-emerald-100 text-emerald-800">
                         Published
                     </span>
                 @else
-                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                    <span class="px-2 lg:px-3 py-1 text-xs lg:text-sm font-semibold rounded-full bg-gray-100 text-gray-800">
                         Draft
                     </span>
                 @endif
-                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                <span class="px-2 lg:px-3 py-1 text-xs lg:text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">
                     {{ $question->marks }} Marks
                 </span>
             </div>
-            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
-                <div class="flex items-center space-x-3">
+            <div class="flex items-center justify-between pt-3 lg:pt-4 border-t border-gray-200">
+                <div class="flex items-center space-x-3 lg:space-x-4">
                     <a href="{{ route('questions.show', $question) }}" class="text-gray-600 hover:text-gray-900 transition p-2" title="View">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                     </a>
                     <a href="{{ route('questions.edit', $question) }}" class="text-indigo-600 hover:text-indigo-900 transition p-2" title="Edit">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                     </a>
@@ -310,7 +310,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-600 hover:text-red-900 transition p-2" title="Delete">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
                         </button>

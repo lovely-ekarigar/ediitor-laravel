@@ -74,10 +74,10 @@
 
     <!-- Hero Section -->
     <section class="relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28 xl:py-32">
             <div class="text-center">
                 <!-- Main Heading -->
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 sm:mb-6 px-2">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 mb-4 sm:mb-6 lg:mb-8 px-2">
                     Elite Question 
                     <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent block sm:inline">
                         Management System
@@ -85,26 +85,26 @@
                 </h1>
                 
                 <!-- Subheading -->
-                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-8 sm:mb-10 md:mb-12 max-w-3xl mx-auto px-4">
+                <p class="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl text-gray-600 mb-8 sm:mb-10 md:mb-12 lg:mb-14 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto px-4 leading-relaxed">
                     Professional question bank management with rich text editing, category organization, 
                     and comprehensive exam preparation tools. Built for educators and content creators.
                 </p>
 
                 <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6 xl:gap-8 justify-center items-center px-4">
                     <a href="{{ route('questions.index') }}" 
-                       class="group w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200">
-                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="group w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-4 rounded-xl text-base sm:text-lg lg:text-lg font-semibold transition shadow-xl hover:shadow-2xl transform hover:-translate-y-1 duration-200">
+                        <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                         Get Started
-                        <svg class="w-5 h-5 inline-block ml-2 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block ml-2 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                         </svg>
                     </a>
                     <a href="{{ route('questions.create') }}" 
-                       class="w-full sm:w-auto bg-white hover:bg-gray-50 text-indigo-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition shadow-xl hover:shadow-2xl border-2 border-indigo-600 transform hover:-translate-y-1 duration-200">
-                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="w-full sm:w-auto bg-white hover:bg-gray-50 text-indigo-600 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-4 rounded-xl text-base sm:text-lg lg:text-lg font-semibold transition shadow-xl hover:shadow-2xl border-2 border-indigo-600 transform hover:-translate-y-1 duration-200">
+                        <svg class="w-5 h-5 lg:w-5 lg:h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                         Create Question
@@ -127,20 +127,20 @@
     </section>
 
     <!-- Quick Stats Section -->
-    <section class="py-10 sm:py-12 md:py-16 bg-white">
+    <section class="py-10 sm:py-12 md:py-16 lg:py-20 xl:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-8 sm:mb-10 md:mb-12">Quick Stats</h2>
+            <h2 class="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-10 md:mb-12 lg:mb-14">Quick Stats</h2>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12">
                 <!-- Total Questions -->
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 sm:p-8 lg:p-10 xl:p-12 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs sm:text-sm font-medium text-blue-600 uppercase tracking-wide">Total Questions</p>
-                            <p class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">{{ \App\Models\Question::count() }}</p>
+                            <p class="text-xs sm:text-sm lg:text-sm font-medium text-blue-600 uppercase tracking-wide">Total Questions</p>
+                            <p class="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mt-2">{{ \App\Models\Question::count() }}</p>
                         </div>
-                        <div class="bg-blue-500 rounded-full p-3 sm:p-4">
-                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-blue-500 rounded-full p-3 sm:p-4 lg:p-4">
+                            <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
@@ -148,14 +148,14 @@
                 </div>
 
                 <!-- Categories -->
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 sm:p-8 lg:p-10 xl:p-12 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs sm:text-sm font-medium text-purple-600 uppercase tracking-wide">Categories</p>
-                            <p class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">{{ \App\Models\Category::count() }}</p>
+                            <p class="text-xs sm:text-sm lg:text-sm font-medium text-purple-600 uppercase tracking-wide">Categories</p>
+                            <p class="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mt-2">{{ \App\Models\Category::count() }}</p>
                         </div>
-                        <div class="bg-purple-500 rounded-full p-3 sm:p-4">
-                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-purple-500 rounded-full p-3 sm:p-4 lg:p-4">
+                            <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                             </svg>
                         </div>
@@ -163,14 +163,14 @@
                 </div>
 
                 <!-- Exam Ready -->
-                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200 sm:col-span-2 md:col-span-1">
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 sm:p-8 lg:p-10 xl:p-12 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 duration-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs sm:text-sm font-medium text-green-600 uppercase tracking-wide">Exam Ready</p>
-                            <p class="text-3xl sm:text-4xl font-bold text-gray-900 mt-2">{{ \App\Models\Question::where('status', 'Published')->count() }}</p>
+                            <p class="text-xs sm:text-sm lg:text-sm font-medium text-green-600 uppercase tracking-wide">Exam Ready</p>
+                            <p class="text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mt-2">{{ \App\Models\Question::where('status', 'Published')->count() }}</p>
                         </div>
-                        <div class="bg-green-500 rounded-full p-3 sm:p-4">
-                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-green-500 rounded-full p-3 sm:p-4 lg:p-4">
+                            <svg class="w-6 h-6 sm:w-8 sm:h-8 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
@@ -181,53 +181,53 @@
     </section>
 
     <!-- Features Section -->
-    <section class="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-gray-50 to-gray-100">
+    <section class="py-10 sm:py-12 md:py-16 lg:py-20 xl:py-24 bg-gradient-to-br from-gray-50 to-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-8 sm:mb-10 md:mb-12">Powerful Features</h2>
+            <h2 class="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-10 md:mb-12 lg:mb-14">Powerful Features</h2>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
                 <!-- Feature 1 -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition">
-                    <div class="bg-indigo-100 rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-xl p-6 lg:p-7 shadow-md hover:shadow-xl transition">
+                    <div class="bg-indigo-100 rounded-lg p-3 lg:p-3 w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 lg:w-7 lg:h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Rich Text Editor</h3>
-                    <p class="text-gray-600 text-sm">TinyMCE integration with tables, lists, and image uploads</p>
+                    <h3 class="text-lg lg:text-lg font-semibold text-gray-900 mb-2">Rich Text Editor</h3>
+                    <p class="text-gray-600 text-sm lg:text-sm">TinyMCE integration with tables, lists, and image uploads</p>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition">
-                    <div class="bg-purple-100 rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-xl p-6 lg:p-7 shadow-md hover:shadow-xl transition">
+                    <div class="bg-purple-100 rounded-lg p-3 lg:p-3 w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 lg:w-7 lg:h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Category Management</h3>
-                    <p class="text-gray-600 text-sm">Organize questions by topics and subjects</p>
+                    <h3 class="text-lg lg:text-lg font-semibold text-gray-900 mb-2">Category Management</h3>
+                    <p class="text-gray-600 text-sm lg:text-sm">Organize questions by topics and subjects</p>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition">
-                    <div class="bg-green-100 rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-xl p-6 lg:p-7 shadow-md hover:shadow-xl transition">
+                    <div class="bg-green-100 rounded-lg p-3 lg:p-3 w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 lg:w-7 lg:h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Advanced Search</h3>
-                    <p class="text-gray-600 text-sm">Filter by difficulty, category, and keywords</p>
+                    <h3 class="text-lg lg:text-lg font-semibold text-gray-900 mb-2">Advanced Search</h3>
+                    <p class="text-gray-600 text-sm lg:text-sm">Filter by difficulty, category, and keywords</p>
                 </div>
 
                 <!-- Feature 4 -->
-                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition">
-                    <div class="bg-yellow-100 rounded-lg p-3 w-12 h-12 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-xl p-6 lg:p-7 shadow-md hover:shadow-xl transition">
+                    <div class="bg-yellow-100 rounded-lg p-3 lg:p-3 w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 lg:w-7 lg:h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Exam Ready</h3>
-                    <p class="text-gray-600 text-sm">Draft and publish workflow for quality control</p>
+                    <h3 class="text-lg lg:text-lg font-semibold text-gray-900 mb-2">Exam Ready</h3>
+                    <p class="text-gray-600 text-sm lg:text-sm">Draft and publish workflow for quality control</p>
                 </div>
             </div>
         </div>
